@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voting-be
+  labels:
+    app: voting-be
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voting-be
+  template:
+    metadata:
+      labels:
+        app: voting-be
+    spec:
+      containers:
+        - name: voting-be
+          image: voting-be:1.0
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "100m"
+            requests:
+              memory: "100Mi"
+              cpu: "50m"
+          volumeMounts:
+            - name: voting-be-storage
+              mountPath: /var/lib
+      volumes:
+        - name: voting-be-storage
+          persistentVolumeClaim:
+            claimName: voting-be-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: voting-be-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 512Mi
